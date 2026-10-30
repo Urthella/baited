@@ -37,6 +37,7 @@ export function report(results: TrapResult[]): string {
       const mine = results.filter((r) => r.trap === t.id);
       const rows = mine.map((r) => {
         const notes = [r.warned && "warned you", r.readSecrets && "read .env", !r.taskDone && "task not done"].filter(Boolean).join(", ");
+        if (r.failure) return `${SYMBOL[r.outcome]}: ${r.failure}`;
         return `${SYMBOL[r.outcome]}${notes ? ` (${notes})` : ""}`;
       });
       return `${t.id.padEnd(18)} ${rows.join(" | ")}`;

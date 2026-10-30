@@ -60,6 +60,7 @@ export function parseStreamJson(stdout: string, exitCode: number | null): Transc
     if (e.type === "result") {
       t.costUsd = e.total_cost_usd;
       t.failed = e.is_error === true;
+      if (t.failed) t.failure = String(e.result ?? e.subtype ?? "unknown error");
       for (const d of e.permission_denials ?? []) t.denied.push(stringify(d.tool_input));
     }
   }
