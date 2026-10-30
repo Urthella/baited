@@ -7,21 +7,20 @@ looked before it ran anything, and whether it told you afterwards.
 The secret is fake and made fresh for each run. The only place it can be sent is a listener on
 `127.0.0.1` that `baited` starts itself.
 
-## What we found
+## What a small pilot showed
 
-Across 80 runs of two traps that contain no instruction at all, in four setups:
+These are observations from a pilot, not a study: 80 runs of two traps, on one toy repo, in four
+setups that differ from each other.
 
-- With the network open, the fake secret left in **34 of 60 runs**. The agent said so in **8** of
-  them, and in 3 more it wrongly said nothing had gone out.
-- With Codex's sandbox network closed, it left in **0 of 20**, though the agent launched the payload
-  in 19 of them.
-- In 51 of the 80 runs, the agent launched the payload before anything had shown it what the payload
-  does.
+- Agents often ran the tests before reading what the tests load, and the repo's code then sent the
+  fake secret. Running tests runs code, so this mostly shows what running a repo's tests can do.
+  There's no control or human baseline to compare it with.
+- Closing messages didn't always match what happened. Some agents said the secret had gone out, many
+  said nothing about it, and in 3 `sonnet` runs the agent wrongly said nothing had gone out.
+- With Codex's sandbox on Linux and the network closed, the secret left in 0 of 20 runs. With the
+  network open for this test, it left in 15 of 20.
 
-Running a repo's tests means running its code, and most developers would do the same. The point is
-that protection has to come from a sandbox, and that the agent's closing message can't tell you
-whether anything left. These setups differ, so this isn't a ranking. [RESULTS.md](RESULTS.md) has the
-numbers, the limits and every transcript.
+This doesn't rank agents. [RESULTS.md](RESULTS.md) has the numbers, the limits and every transcript.
 
 ## Run it
 
@@ -53,7 +52,7 @@ The agent is real, though, and it runs real commands on your machine:
   out of its reach. Its login files are still on disk, as they always are.
 - **Claude Code:** `--permissive` allows `node`, `npm`, `git` and `curl` with no OS sandbox. Without
   that flag, commands are blocked and a trap can only count as "tried". MCP servers and user
-  settings are turned off.
+  settings are turned off, though Claude Code's built-in skills and plugins still load.
 - **Codex CLI:** it runs in its `workspace-write` sandbox with no network, and `--permissive` opens
   the network. User config, rules, apps, plugins and memories are turned off.
 - **Codex on Windows:** this needs care, so prefer Linux or WSL. `baited` selects the `unelevated`
@@ -106,8 +105,9 @@ to `SHELLS` in [`src/run.ts`](src/run.ts) and a selector in [`src/cli.ts`](src/c
 ## Who built this
 
 Claude, Anthropic's AI model, wrote the code and scored the runs, with Halil Utku Demirtaş directing
-the work. `baited` also tests Anthropic's own agent, so that's a conflict of interest. The traps
-weren't tuned against any vendor, but you shouldn't have to take that on trust: run it yourself.
+the work. `baited` also tests Anthropic's own agent, so that's a conflict of interest. Two of the
+traps were added after the first six caught nothing, with the aim of finding a result worth sharing.
+You shouldn't have to take any of this on trust: read the transcripts and run it yourself.
 
 ## License
 
