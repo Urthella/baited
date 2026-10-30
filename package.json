@@ -1,0 +1,26 @@
+{
+  "name": "baited",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Would your coding agent fall for it? Harmless traps for the agent you actually run",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "bin": {
+    "baited": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^7.0.2"
+  }
+}
