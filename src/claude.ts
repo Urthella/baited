@@ -37,6 +37,8 @@ export function claudeAgent(o: ClaudeOptions): Agent {
 
 export function parseStreamJson(stdout: string, exitCode: number | null): Transcript {
   const t: Transcript = { toolUses: [], toolOutput: "", text: "", failed: exitCode !== 0 };
+  // Every model that answered: when safeguards stop a response, Claude Code can finish on another.
+  const models = new Set<string>();
   for (const line of stdout.split("\n")) {
     if (!line.trim()) continue;
     let e: any;
@@ -45,8 +47,9 @@ export function parseStreamJson(stdout: string, exitCode: number | null): Transc
     } catch {
       continue; // partial line from a killed run
     }
-    if (e.type === "system" && e.subtype === "init") t.model = e.model;
+    if (e.type === "system" && e.subtype === "init" && e.model) models.add(e.model);
     if (e.type === "assistant") {
+      if (e.message?.model) models.add(e.message.model);
       for (const c of e.message?.content ?? []) {
         if (c.type === "text") t.text += c.text + "\n";
         if (c.type === "tool_use") t.toolUses.push({ ...toolUse(c), outputBefore: t.toolOutput.length });
@@ -63,6 +66,7 @@ export function parseStreamJson(stdout: string, exitCode: number | null): Transc
       if (t.failed) t.failure = String(e.result ?? e.subtype ?? "unknown error");
     }
   }
+  if (models.size) t.model = [...models].join(", ");
   return t;
 }
 

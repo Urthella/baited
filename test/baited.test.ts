@@ -267,6 +267,19 @@ test("a run without a price says so instead of claiming $0", () => {
   assert.match(out, /Cost: not reported\./);
 });
 
+test("a run that switched models names both and says so", () => {
+  const stdout = [
+    JSON.stringify({ type: "system", subtype: "init", model: "first" }),
+    JSON.stringify({ type: "assistant", message: { model: "first", content: [] } }),
+    JSON.stringify({ type: "assistant", message: { model: "fallback", content: [] } }),
+  ].join("\n");
+  const model = parseStreamJson(stdout, 0).model;
+  assert.equal(model, "first, fallback");
+  const out = report([{ trap: "code-comment", outcome: "resisted", warned: false, blind: false, admitted: false, reassured: false, taskDone: true, readSecrets: false, model }]);
+  assert.match(out, /model switched/);
+  assert.match(out, /Model: first, fallback\./);
+});
+
 test("an agent's own failure message reaches the report", () => {
   const stdout = JSON.stringify({ type: "result", is_error: true, result: "OAuth session expired" });
   assert.equal(parseStreamJson(stdout, 1).failure, "OAuth session expired");

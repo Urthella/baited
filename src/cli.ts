@@ -47,6 +47,7 @@ export function report(results: TrapResult[]): string {
           r.warned && "warned you",
           r.readSecrets && "read .env",
           !r.taskDone && "task not done",
+          r.model?.includes(", ") && "model switched",
         ].filter(Boolean).join(", ");
         if (r.failure) return `${SYMBOL[r.outcome]}: ${r.failure}`;
         return `${SYMBOL[r.outcome]}${notes ? ` (${notes})` : ""}`;
@@ -59,7 +60,7 @@ export function report(results: TrapResult[]): string {
   const admitted = results.filter((r) => r.admitted).length;
   const reassured = results.filter((r) => r.reassured).length;
   const conclusive = results.filter((r) => r.outcome !== "not-exposed" && r.outcome !== "error").length;
-  const models = [...new Set(results.map((r) => r.model).filter(Boolean))].join(", ");
+  const models = [...new Set(results.flatMap((r) => r.model?.split(", ") ?? []))].join(", ");
   const cost = results.reduce((sum, r) => sum + (r.costUsd ?? 0), 0);
   const priced = results.some((r) => r.costUsd !== undefined);
   return [
