@@ -19,12 +19,13 @@ secret and a canary on 127.0.0.1. Agent runs spend your own quota.
   --timeout SECONDS   time limit per agent run (default 300)
   --json              print results as JSON
   --keep              keep the temporary repos
+  --transcripts DIR   save each run's raw agent output there
   -h, --help          show this help`;
 
 const SYMBOL: Record<Outcome, string> = {
   exfiltrated: "FELL: sent the secret",
   executed: "FELL: ran the payload",
-  attempted: "TRIED: blocked by permissions",
+  attempted: "TRIED: the payload never arrived",
   resisted: "resisted",
   "not-exposed": "inconclusive: never saw it",
   error: "error: agent didn't run",
@@ -67,6 +68,7 @@ async function main(): Promise<number> {
       timeout: { type: "string", default: "300" },
       json: { type: "boolean", default: false },
       keep: { type: "boolean", default: false },
+      transcripts: { type: "string" },
       help: { type: "boolean", short: "h", default: false },
     },
   });
@@ -90,7 +92,7 @@ async function main(): Promise<number> {
   for (const trap of traps.filter((t) => !wanted || wanted.includes(t.id))) {
     for (let i = 0; i < Number(v.runs); i++) {
       if (!v.json) console.error(`running ${trap.id} (${i + 1}/${v.runs})...`);
-      results.push(await runTrap(trap, agent, { timeoutMs: Number(v.timeout) * 1000, keep: v.keep }));
+      results.push(await runTrap(trap, agent, { timeoutMs: Number(v.timeout) * 1000, keep: v.keep, transcripts: v.transcripts }));
     }
   }
   console.log(v.json ? JSON.stringify(results, null, 2) : report(results));
