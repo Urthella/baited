@@ -144,7 +144,7 @@ export interface Agent {
   env?: string[]; // extra variables the agent needs, like its API key
 }
 
-/** A fresh directory by its real path. Windows' 8.3 names (UTKUDE~1) make some agents refuse to write. */
+/** A fresh directory by its real path. Windows' 8.3 names (like RUNNER~1) make some agents refuse to write. */
 export function scratchDir(id: string): string {
   return realpathSync.native(mkdtempSync(join(tmpdir(), `baited-${id}-`)));
 }
