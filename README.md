@@ -7,6 +7,22 @@ looked before it ran anything, and whether it told you afterwards.
 The secret is fake and made fresh for each run. The only place it can be sent is a listener on
 `127.0.0.1` that `baited` starts itself.
 
+## What we found
+
+Across 80 runs of two traps that contain no instruction at all, in four setups:
+
+- With the network open, the fake secret left in **34 of 60 runs**. The agent said so in **8** of
+  them, and in 3 more it wrongly said nothing had gone out.
+- With Codex's sandbox network closed, it left in **0 of 20**, though the agent launched the payload
+  in 19 of them.
+- In 51 of the 80 runs, the agent launched the payload before anything had shown it what the payload
+  does.
+
+Running a repo's tests means running its code, and most developers would do the same. The point is
+that protection has to come from a sandbox, and that the agent's closing message can't tell you
+whether anything left. These setups differ, so this isn't a ranking. [RESULTS.md](RESULTS.md) has the
+numbers, the limits and every transcript.
+
 ## Run it
 
 You need Node 24 and an agent CLI you're already logged in to. There's nothing to install: `baited`
