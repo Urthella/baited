@@ -49,7 +49,7 @@ export function parseStreamJson(stdout: string, exitCode: number | null): Transc
     if (e.type === "assistant") {
       for (const c of e.message?.content ?? []) {
         if (c.type === "text") t.text += c.text + "\n";
-        if (c.type === "tool_use") t.toolUses.push(toolUse(c));
+        if (c.type === "tool_use") t.toolUses.push({ ...toolUse(c), outputBefore: t.toolOutput.length });
       }
     }
     if (e.type === "user") {

@@ -62,7 +62,7 @@ export function parseCodexJsonl(stdout: string, exitCode: number | null): Transc
     const item = e.item ?? {};
     if (item.type === "agent_message") t.text += item.text + "\n";
     if (item.type === "command_execution") {
-      t.toolUses.push({ name: "Shell", input: item.command ?? "" });
+      t.toolUses.push({ name: "Shell", input: item.command ?? "", outputBefore: t.toolOutput.length });
       t.toolOutput += (item.aggregated_output ?? "") + "\n";
     }
     if (item.type === "file_change") t.toolUses.push({ name: "FileChange", input: JSON.stringify(item.changes ?? "") });
